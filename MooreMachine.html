@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Moore Machine - EREN TURGUT</title>
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        />
+
+        <style>
+            body {
+                font-family: "Poppins", sans-serif;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                background: linear-gradient(to right, #8c00ff, #10adf4);
+            }
+
+            .container {
+                background: rgba(0, 0, 0, 0.356);
+                border-radius: 10px;
+                padding: 20px;
+                width: 400px;
+                text-align: center;
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.5),
+                    0 0 30px rgba(255, 255, 255, 0.3);
+                overflow-x: auto;
+            }
+
+            h1 {
+                margin: 20px 0;
+                color: #fff;
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+
+            label {
+                display: block;
+                text-align: left;
+                margin: 10px;
+                font-size: 14px;
+                color: #fff;
+            }
+
+            input {
+                width: calc(100% - 20px);
+                padding: 10px;
+                margin: 0 10px 20px;
+                border: none;
+                border-radius: 4px;
+                box-sizing: border-box;
+                background: rgba(255, 255, 255, 0.5);
+                color: #333;
+            }
+
+            button {
+                background: linear-gradient(to right, #23c552, #00db3e);
+                color: #fff;
+                border: none;
+                padding: 15px 20px;
+                font-size: 16px;
+                cursor: pointer;
+                border-radius: 4px;
+                box-shadow: 0 5px 6px rgba(0, 255, 34, 0.2);
+                transition: background 0.5s ease, box-shadow 0.5s ease;
+            }
+
+            button:hover {
+                background: linear-gradient(to right, #00db3e, #23c552);
+                box-shadow: 0 8px 15px rgba(21, 255, 0, 0.4);
+            }
+
+            #result {
+                margin-top: 20px;
+                color: #fff;
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+                overflow-x: auto;
+            }
+
+            table {
+                margin: 0 auto;
+                border-collapse: collapse;
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            th,
+            td {
+                padding: 10px;
+                border: 1px solid #fff;
+                white-space: nowrap;
+            }
+
+            th {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+            #authorInfo {
+                margin-top: 20px;
+                color: #fff;
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+            #outputString {
+                margin-top: 15px;
+                color: #fff;
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+                font-size: large;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Moore Machine Assignment</h1>
+
+            <div id="authorInfo">Eren TURGUT - 201220034</div>
+
+            <br />
+
+            <div id="form">
+                <label for="inputString"
+                    >Enter the string to be processed:</label
+                >
+                <input type="text" id="inputString" />
+
+                <button onclick="processInput()">Submit</button>
+            </div>
+
+            <div id="outputSection">
+                <h2 id="authorInfo">OUTPUT:</h2>
+                <p id="outputString"></p>
+                <table id="outputTable"></table>
+            </div>
+        </div>
+
+        <script>
+            class MooreMachine {
+                constructor(
+                    states,
+                    inputAlphabet,
+                    outputAlphabet,
+                    transitionTable,
+                    outputTable
+                ) {
+                    this.states = states;
+                    this.inputAlphabet = inputAlphabet;
+                    this.outputAlphabet = outputAlphabet;
+                    this.transitionTable = transitionTable;
+                    this.outputTable = outputTable;
+                    this.currentState = states[0];
+                }
+
+                processInputVerbose(inputString) {
+                    var table = document.createElement("table");
+                    table.border = "1";
+
+                    var outputString = "";
+                    for (var i = 0; i < inputString.length; i++) {
+                        var symbol = inputString[i];
+                        if (!this.inputAlphabet.includes(symbol)) {
+                            throw new Error("Invalid Input Symbol!");
+                        }
+
+                        var nextState =
+                            this.transitionTable[this.currentState][symbol];
+                        var outputSymbol = this.outputTable[nextState];
+                        outputString += outputSymbol;
+
+                        var row = table.insertRow(i);
+                        var cells = [
+                            symbol,
+                            this.currentState,
+                            nextState,
+                            outputSymbol,
+                        ];
+
+                        cells.forEach(function (cellText) {
+                            var cell = row.insertCell();
+                            var text = document.createTextNode(cellText);
+                            cell.appendChild(text);
+                        });
+
+                        this.currentState = nextState;
+                    }
+
+                    document.getElementById("outputString").innerHTML =
+                        outputString;
+                    document.getElementById("outputTable").innerHTML = "";
+                    document.getElementById("outputTable").appendChild(table);
+                    return outputString;
+                }
+            }
+
+            function createMooreMachine() {
+                var states = prompt(
+                    "Enter Finite States in the specified format Q: {q0, q1, q2, ..., q10}"
+                ).match(/\w+/g);
+                var inputAlphabet = prompt(
+                    "Enter your Input Alphabet in the specified format S={a,b}"
+                ).match(/\w+/g);
+                var outputAlphabet = prompt(
+                    "Enter your Output Alphabet in the specified format Γ={0,1}"
+                ).match(/\w+/g);
+
+                var transitionTable = {};
+                var outputTable = {};
+
+                states.forEach(function (state) {
+                    transitionTable[state] = {};
+                    outputTable[state] = prompt(
+                        "Enter the Output of State " + state + ":"
+                    );
+
+                    inputAlphabet.forEach(function (symbol) {
+                        transitionTable[state][symbol] = prompt(
+                            "Enter the State to go to when in state " +
+                                state +
+                                " and the symbol " +
+                                symbol +
+                                " is received:"
+                        );
+                    });
+                });
+
+                return new MooreMachine(
+                    states,
+                    inputAlphabet,
+                    outputAlphabet,
+                    transitionTable,
+                    outputTable
+                );
+            }
+
+            function processInput() {
+                var inputString = document.getElementById("inputString").value;
+                var mooreMachine = createMooreMachine();
+                var outputString =
+                    mooreMachine.processInputVerbose(inputString);
+            }
+        </script>
+    </body>
+</html>
